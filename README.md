@@ -8,6 +8,6 @@ This is a fork of [h0tk3y/better-parse](https://github.com/h0tk3y/better-parse) 
 
 ```groovy
 dependencies {
-   implementation("com.quarkdown.better-parse:better-parse:0.4.4")
+   implementation("com.quarkdown.better-parse:better-parse:0.4.5")
 }
 ```
