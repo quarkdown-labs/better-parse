@@ -21,7 +21,7 @@ val jsMainCompilation = kotlin.js().compilations.getByName("main")
 
 val assembleWeb = tasks.register<Sync>("assembleWeb") {
     from(project.provider {
-        jsMainCompilation.compileDependencyFiles.map { it.absolutePath }.map(::zipTree).map {
+        jsMainCompilation.compileDependencyFiles.files.filter { it.isFile }.map(::zipTree).map {
             it.matching {
                 include("*.js")
                 exclude("**/META-INF/**")
