@@ -4,18 +4,20 @@ import org.gradle.api.plugins.ExtraPropertiesExtension
 import kotlin.reflect.full.memberProperties
 
 // Set to the new version
-val kotlinVersion = KotlinPlugin.V2221
+val kotlinVersion = KotlinPlugin.V2420
 
 enum class KotlinPlugin {
-    V2221
+    V2420
 }
 
 val versions = when (kotlinVersion) {
-    KotlinPlugin.V2221 -> Versions(
-        version = "0.4.4",
-        kotlinVersion = "2.2.21",
+    KotlinPlugin.V2420 -> Versions(
+        // Single source of truth for the release version, bumped by the release workflow.
+        version = settings.settingsDir.resolve("version.txt").readText().trim(),
+        kotlinVersion = "2.4.20",
         serializationVersion = "1.8.1",
-        benchmarkVersion = "0.4.15"
+        benchmarkVersion = "0.4.15",
+        mavenPublishVersion = "0.37.0"
     )
 }
 
@@ -32,7 +34,8 @@ data class Versions(
     val version: String,
     val kotlinVersion: String,
     val serializationVersion: String,
-    val benchmarkVersion: String
+    val benchmarkVersion: String,
+    val mavenPublishVersion: String
 )
 
 fun addGlobalProperty(key: String, value: String) {

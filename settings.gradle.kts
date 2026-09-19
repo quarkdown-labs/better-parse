@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.gradle.api.artifacts.dsl.RepositoryHandler
-
 pluginManagement {
     abstract class RepositorySetup :
         BuildServiceParameters, (RepositoryHandler, Boolean) -> Unit, BuildService<RepositorySetup> {
@@ -21,13 +19,18 @@ pluginManagement {
     apply(from = "versions.settings.gradle.kts")
     val kotlinVersion: String by settings
     val benchmarkVersion: String by settings
+    val mavenPublishVersion: String by settings
 
     plugins {
         kotlin("multiplatform").version(kotlinVersion)
-        kotlin("js").version(kotlinVersion)
         kotlin("plugin.allopen").version(kotlinVersion)
         id("org.jetbrains.kotlinx.benchmark").version(benchmarkVersion)
+        id("com.vanniktech.maven.publish").version(mavenPublishVersion)
     }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 rootProject.name = "better-parse"

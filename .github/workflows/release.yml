@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags: [v*]
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    name: Publish to Maven Central
+    needs: ci
+    # macOS is the only host able to build every target of this library:
+    # Apple, Linux, MinGW, JVM, JS and Wasm.
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full tag history, required by replace-version-in-files to determine the previous release version.
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Bumps version.txt and the version referenced by the README, commits both
+      # to master, and publishes the GitHub release.
+      - name: Release
+        uses: iamgio/simple-release@v1
+        with:
+          version-file: version.txt
+          replace-version-in-files: README.md
+          commit: 'true'
+          commit-branch: master
+
+      # Publishes the version now recorded in version.txt.
+      - name: Publish to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryPassword: ${{ secrets.SIGNING_PASSWORD }}
+        run: ./gradlew --no-daemon publishAndReleaseToMavenCentral --stacktrace
